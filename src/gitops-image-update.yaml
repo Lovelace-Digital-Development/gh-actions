@@ -1,0 +1,26 @@
+name: Api Delivery
+on:
+  push:
+    branches:
+      - 'master'
+jobs:
+  delivery:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Pull gitops repository
+      uses: actions/checkout@v3
+      with:
+        repository: <gitops-repository>
+        ref: master 
+        token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
+    - name: Update Image Version in the related HelmChart values.yaml
+      uses: fjogeleit/yaml-update-action@main
+      with:
+        repository: <gitops-repository>
+        targetBranch: master
+        token: <secret-token-with-rw-repo-permisions>
+        valueFile: <charts-value-file>
+        propertyPath: <image-tag property in values file>
+        value: <image-tag>
+        message: 'Update API image version to <image-tag>'
